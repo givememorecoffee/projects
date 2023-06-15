@@ -1,0 +1,93 @@
+
+
+USE final_project;
+
+
+SELECT * FROM customer;
+
+SELECT * FROM employee;
+
+SELECT * FROM invoice;
+
+SELECT * FROM invoiceline;
+
+SELECT * FROM track;
+
+SELECT * FROM mediatype;
+
+SELECT * FROM genre;
+
+SELECT * FROM album;
+
+SELECT * FROM playlist;
+
+SELECT * FROM playlisttrack;
+
+SELECT * FROM artist;
+
+#Which countries have the most number of Invoices?
+SELECT BILLINGCOUNTRY,
+  	COUNT(INVOICEID) AS count_of_invoices
+  FROM INVOICE
+  GROUP BY BILLINGCOUNTRY
+  ORDER BY COUNT(INVOICEID) DESC;
+  
+ # Which city has the best customers who spent the most?
+ 
+ SELECT BILLINGCITY,
+  	SUM(TOTAL) AS total_sum
+  FROM INVOICE
+  GROUP BY BILLINGCITY
+  ORDER BY SUM(TOTAL) DESC;
+  
+ # Who is the best customer? 
+ 
+ SELECT C.CUSTOMERID,C.firstName,C.lastName,
+  	SUM(I.TOTAL) AS total
+  FROM CUSTOMER C
+  JOIN INVOICE I ON C.CUSTOMERID = I.CUSTOMERID
+  GROUP BY C.CUSTOMERID
+  ORDER BY SUM(I.TOTAL) DESC;
+  
+ # Show the email, first name, last name, and Genre of all Rock Music listeners.
+ #order alphabetically by email address
+  
+ SELECT DISTINCT C.EMAIL,
+  	C.FIRSTNAME,
+  	C.LASTNAME,
+  	G.NAME
+  FROM CUSTOMER C
+  JOIN INVOICE I ON C.CUSTOMERID = I.CUSTOMERID
+  JOIN INVOICELINE IL ON IL.INVOICEID = I.INVOICEID
+  JOIN TRACK T ON IL.TRACKID = T.TRACKID
+  JOIN GENRE G ON T.GENREID = G.GENREID
+  WHERE G.NAME = 'Rock'
+  ORDER BY C.EMAIL;
+  
+  
+  #Who is writing the rock music?
+  
+  SELECT AR.NAME,
+  	COUNT(T.NAME)
+  FROM TRACK T
+  JOIN GENRE G ON T.GENREID = G.GENREID
+  JOIN ALBUM AL ON AL.ALBUMID = T.ALBUMID
+  JOIN ARTIST AR ON AR.ARTISTID = AL.ARTISTID
+  WHERE G.NAME = 'Rock'
+  GROUP BY AR.NAME
+  ORDER BY COUNT(T.NAME) DESC;
+  
+  
+  #How many songs based on genre does customer 11 bought
+  SELECT DISTINCT G.NAME GENRE,
+  	COUNT(T.NAME)
+  FROM CUSTOMER C
+  JOIN INVOICE I ON I.CUSTOMERID = C.CUSTOMERID
+  JOIN INVOICELINE IL ON IL.INVOICEID = I.INVOICEID
+  JOIN TRACK T ON T.TRACKID = IL.TRACKID
+  JOIN GENRE G ON G.GENREID = T.GENREID
+  WHERE C.CUSTOMERID = 11
+  GROUP BY G.NAME
+  ORDER BY G.NAME;
+  
+  
